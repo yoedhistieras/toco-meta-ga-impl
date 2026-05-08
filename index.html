@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Tracking Review — Toco</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --toco-yellow: #F5C800;
+  --toco-yellow-bg: #FFFBEA;
+  --toco-yellow-border: #F5C800;
+  --toco-dark: #1A1A1A;
+  --toco-mid: #444444;
+  --toco-soft: #888888;
+  --toco-border: #E8E8E8;
+  --toco-bg: #F5F5F3;
+  --white: #FFFFFF;
+  --red: #E24B4A;
+  --red-bg: #FEF2F2;
+  --green: #2E7D32;
+  --green-bg: #F1F8F1;
+  --orange: #C05621;
+  --orange-bg: #FFF7F0;
+  --blue: #1565C0;
+  --blue-bg: #EEF4FF;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--toco-bg);
+  color: var(--toco-dark);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* HEADER */
+.header {
+  background: var(--toco-dark);
+  padding: 40px 48px 36px;
+}
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.logo-mark {
+  background: var(--toco-yellow);
+  color: var(--toco-dark);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.logo-sep {
+  color: #555;
+  font-size: 13px;
+}
+.logo-title {
+  color: #888;
+  font-size: 13px;
+}
+.header h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.header-sub {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 28px;
+}
+.header-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
+.meta-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+.meta-value { font-size: 12px; color: #ccc; font-weight: 500; }
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 14px 48px;
+  background: var(--white);
+  border-bottom: 1px solid var(--toco-border);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--toco-mid); }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.ld-ok { background: var(--toco-yellow); }
+.ld-partial { background: var(--orange); }
+.ld-missing { background: var(--red); }
+
+/* JOURNEY BAR */
+.journey-bar {
+  background: var(--white);
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--toco-border);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+}
+.jb-step {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+.jb-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 90px;
+}
+.jb-circle {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+.jb-ok { background: var(--toco-yellow); color: var(--toco-dark); }
+.jb-partial { background: var(--orange); color: var(--white); }
+.jb-missing { background: var(--red); color: var(--white); }
+.jb-neutral { background: var(--toco-bg); color: var(--toco-soft); border: 1px solid var(--toco-border); }
+.jb-label { font-size: 10px; color: var(--toco-mid); text-align: center; line-height: 1.3; max-width: 80px; }
+.jb-arrow {
+  color: var(--toco-border);
+  font-size: 16px;
+  padding: 0 4px;
+  margin-bottom: 16px;
+}
+
+/* MAIN */
+.main { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+
+/* SECTION LABEL */
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--toco-soft);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--toco-border);
+}
+
+/* EVENT CARD */
+.ev-card {
+  background: var(--white);
+  border: 1px solid var(--toco-border);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.ev-card.status-ok { border-top: 3px solid var(--toco-yellow); }
+.ev-card.status-partial { border-top: 3px solid var(--orange); }
+.ev-card.status-missing { border-top: 3px solid var(--red); }
+.ev-card.status-confirm { border-top: 3px solid #888; }
+
+.ev-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--toco-border);
+}
+.ev-head-left { display: flex; align-items: center; gap: 12px; }
+.ev-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ev-dot-ok { background: var(--toco-yellow); }
+.ev-dot-partial { background: var(--orange); }
+.ev-dot-missing { background: var(--red); }
+.ev-dot-confirm { background: #aaa; }
+.ev-name { font-size: 15px; font-weight: 600; color: var(--toco-dark); }
+.ev-ga4 { font-size: 11px; color: var(--toco-soft); font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+.ev-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge {
+  font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 4px;
+  white-space: nowrap;
+}
+.b-fe { background: var(--blue-bg); color: var(--blue); }
+.b-be { background: var(--green-bg); color: var(--green); }
+.b-fe-be { background: #F3EEFF; color: #5B34B7; }
+.b-ok { background: var(--toco-yellow-bg); color: #7A5F00; border: 1px solid #F5C800; }
+.b-missing { background: var(--red-bg); color: var(--red); }
+.b-partial { background: var(--orange-bg); color: var(--orange); }
+.b-confirm { background: var(--toco-bg); color: var(--toco-soft); border: 1px solid var(--toco-border); }
+
+.ev-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.ev-section {
+  padding: 16px 20px;
+}
+.ev-section + .ev-section {
+  border-left: 1px solid var(--toco-border);
+}
+.ev-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--toco-soft);
+  margin-bottom: 10px;
+}
+
+/* TRIGGER BOX */
+.trigger-box {
+  background: var(--toco-bg);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.trigger-screen {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--toco-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.trigger-icon {
+  width: 16px; height: 16px;
+  background: var(--toco-yellow);
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+}
+.trigger-action {
+  font-size: 12px;
+  color: var(--toco-soft);
+}
+.trigger-note {
+  font-size: 11px;
+  color: var(--orange);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #E8E8E8;
+  line-height: 1.4;
+}
+
+/* PARAMS */
+.param-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #F5F5F5;
+  gap: 8px;
+}
+.param-row:last-child { border-bottom: none; }
+.param-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--toco-dark);
+}
+.param-req {
+  font-size: 10px;
+  color: var(--toco-soft);
+}
+.param-status { font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.ps-ok { color: var(--green); }
+.ps-missing { color: var(--red); }
+.ps-note { color: var(--orange); }
+
+/* SUGGESTION */
+.ev-suggestion {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--toco-border);
+  padding: 14px 20px;
+  background: var(--toco-yellow-bg);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.suggestion-icon {
+  width: 20px; height: 20px;
+  background: var(--toco-yellow);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--toco-dark);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.suggestion-text {
+  font-size: 12px;
+  color: #5A4A00;
+  line-height: 1.6;
+}
+.suggestion-text strong { color: var(--toco-dark); font-weight: 600; }
+.suggestion-text code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(0,0,0,0.06);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* CONFIRM BOX */
+.ev-confirm {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--toco-border);
+  padding: 14px 20px;
+  background: #FAFAFA;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.confirm-icon {
+  width: 20px; height: 20px;
+  background: #E8E8E8;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.confirm-text { font-size: 12px; color: var(--toco-mid); line-height: 1.6; }
+.confirm-text strong { color: var(--toco-dark); font-weight: 600; }
+.confirm-text code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(0,0,0,0.06);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* SPACER */
+.spacer { margin-bottom: 40px; }
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 28px;
+  font-size: 11px;
+  color: var(--toco-soft);
+  border-top: 1px solid var(--toco-border);
+  background: var(--white);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .header { padding: 28px 20px 24px; }
+  .legend { padding: 12px 20px; }
+  .journey-bar { padding: 16px 20px; }
+  .main { padding: 24px 16px; }
+  .ev-body { grid-template-columns: 1fr; }
+  .ev-section + .ev-section { border-left: none; border-top: 1px solid var(--toco-border); }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <span class="logo-mark">toco</span>
+    <span class="logo-sep">/</span>
+    <span class="logo-title">Marketing Review</span>
+  </div>
+  <h1>Event Tracking Review<br>Meta & GA4</h1>
+  <p class="header-sub">Buyer journey coverage — trigger, parameter, dan suggestion per event</p>
+  <div class="header-meta">
+    <div class="meta-item">
+      <span class="meta-label">Reviewer</span>
+      <span class="meta-value">Yudis (Marketing)</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Referensi</span>
+      <span class="meta-value">PRD Server-Side Checkout Tracking</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Priority</span>
+      <span class="meta-value">Meta CAPI → GA4</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Tanggal</span>
+      <span class="meta-value">8 Mei 2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <span style="font-size:12px;font-weight:500;color:var(--toco-mid);margin-right:4px;">Status:</span>
+  <div class="legend-item"><span class="legend-dot ld-ok"></span>Parameter lengkap / sudah ada di PRD</div>
+  <div class="legend-item"><span class="legend-dot ld-partial"></span>Ada di PRD tapi ada parameter yang missing</div>
+  <div class="legend-item"><span class="legend-dot ld-missing"></span>Tidak ada di PRD / perlu ditambahkan</div>
+</div>
+
+<!-- JOURNEY BAR -->
+<div class="journey-bar">
+  <div class="jb-step">
+    <div class="jb-node">
+      <div class="jb-circle jb-neutral">01</div>
+      <div class="jb-label">Homepage</div>
+    </div>
+  </div>
+  <div class="jb-arrow">→</div>
+  <div class="jb-step">
+    <div class="jb-node">
+      <div class="jb-circle jb-missing">02</div>
+      <div class="jb-label">Product Detail Page</div>
+    </div>
+  </div>
+  <div class="jb-arrow">→</div>
+  <div class="jb-step">
+    <div class="jb-node">
+      <div class="jb-circle jb-missing">03</div>
+      <div class="jb-label">Add to Cart</div>
+    </div>
+  </div>
+  <div class="jb-arrow">→</div>
+  <div class="jb-step">
+    <div class="jb-node">
+      <div class="jb-circle jb-partial">04</div>
+      <div class="jb-label">Cart → Checkout</div>
+    </div>
+  </div>
+  <div class="jb-arrow">→</div>
+  <div class="jb-step">
+    <div class="jb-node">
+      <div class="jb-circle jb-partial">05</div>
+      <div class="jb-label">Order Confirmed</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- EVENT 1: PAGEVIEW -->
+  <div class="section-label">Event 01</div>
+  <div class="ev-card status-confirm">
+    <div class="ev-head">
+      <div class="ev-head-left">
+        <div class="ev-dot ev-dot-confirm"></div>
+        <div>
+          <div class="ev-name">PageView</div>
+          <div class="ev-ga4">page_view — GA4</div>
+        </div>
+      </div>
+      <div class="ev-badges">
+        <span class="badge b-fe">FE</span>
+        <span class="badge b-confirm">Perlu dikonfirmasi</span>
+      </div>
+    </div>
+    <div class="ev-body">
+      <div class="ev-section">
+        <div class="ev-section-label">Trigger</div>
+        <div class="trigger-box">
+          <div class="trigger-screen">
+            <span class="trigger-icon">🏠</span>
+            Semua halaman
+          </div>
+          <div class="trigger-action">Load halaman mana saja (homepage, PDP, cart, dsb.)</div>
+        </div>
+      </div>
+      <div class="ev-section">
+        <div class="ev-section-label">Parameters</div>
+        <div class="param-row">
+          <span class="param-name">Base Pixel / gtag</span>
+          <span class="param-status ps-note">Perlu dicek</span>
+        </div>
+      </div>
+      <div class="ev-confirm">
+        <div class="confirm-icon">?</div>
+        <div class="confirm-text">
+          PRD tidak menyebut nasib base Pixel saat FE cleanup. <strong>Pastikan base Pixel initialization code tidak ikut terhapus</strong> ketika <code>tocoAnalyticBeginCheckout()</code> dan <code>tocoAnalyticPurchase()</code> diremove. PageView harus tetap fire di semua halaman.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+
+  <!-- EVENT 2: VIEWCONTENT -->
+  <div class="section-label">Event 02</div>
+  <div class="ev-card status-missing">
+    <div class="ev-head">
+      <div class="ev-head-left">
+        <div class="ev-dot ev-dot-missing"></div>
+        <div>
+          <div class="ev-name">ViewContent</div>
+          <div class="ev-ga4">view_item — GA4</div>
+        </div>
+      </div>
+      <div class="ev-badges">
+        <span class="badge b-fe">FE</span>
+        <span class="badge b-missing">Scope out di PRD</span>
+      </div>
+    </div>
+    <div class="ev-body">
+      <div class="ev-section">
+        <div class="ev-section-label">Trigger</div>
+        <div class="trigger-box">
+          <div class="trigger-screen">
+            <span class="trigger-icon">📄</span>
+            Product Detail Page
+          </div>
+          <div class="trigger-action">Saat halaman produk selesai load</div>
+          <div class="trigger-note">⚠ Di-scope out di PRD dengan alasan "no order context needed" — tapi event ini tetap harus ada di FE.</div>
+        </div>
+      </div>
+      <div class="ev-section">
+        <div class="ev-section-label">Parameters</div>
+        <div class="param-row">
+          <div><span class="param-name">content_ids</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_type</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">value</span><br><span class="param-req">Recommended · Meta & GA4</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">currency</span><br><span class="param-req">Recommended · Meta & GA4</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_name</span><br><span class="param-req">Recommended · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">item_id, item_name</span><br><span class="param-req">Required · GA4</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+      </div>
+      <div class="ev-suggestion">
+        <div class="suggestion-icon">!</div>
+        <div class="suggestion-text">
+          <strong>Tidak perlu dipindah ke BE</strong> — tetap di FE. Yang penting: event ini tidak boleh ikut hilang saat FE cleanup, dan semua parameter di atas harus ada. ViewContent adalah basis audience retargeting <em>"lihat produk tapi belum beli"</em> di Meta — tanpa ini kita tidak bisa build segment tersebut.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+
+  <!-- EVENT 3: ADD TO CART -->
+  <div class="section-label">Event 03</div>
+  <div class="ev-card status-missing">
+    <div class="ev-head">
+      <div class="ev-head-left">
+        <div class="ev-dot ev-dot-missing"></div>
+        <div>
+          <div class="ev-name">AddToCart</div>
+          <div class="ev-ga4">add_to_cart — GA4</div>
+        </div>
+      </div>
+      <div class="ev-badges">
+        <span class="badge b-fe">FE</span>
+        <span class="badge b-missing">Scope out di PRD</span>
+      </div>
+    </div>
+    <div class="ev-body">
+      <div class="ev-section">
+        <div class="ev-section-label">Trigger</div>
+        <div class="trigger-box">
+          <div class="trigger-screen">
+            <span class="trigger-icon">🛒</span>
+            Product Detail Page
+          </div>
+          <div class="trigger-action">Klik "Tambah ke Keranjang"</div>
+          <div class="trigger-note">⚠ Klik "Beli Sekarang" juga harus fire event ini sebelum lanjut ke checkout — jangan skip.</div>
+        </div>
+      </div>
+      <div class="ev-section">
+        <div class="ev-section-label">Parameters</div>
+        <div class="param-row">
+          <div><span class="param-name">content_ids</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_type</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">value</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-note">Pre-promo ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">currency</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">contents</span><br><span class="param-req">Recommended · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">num_items</span><br><span class="param-req">Recommended · Meta</span></div>
+          <span class="param-status ps-missing">Missing</span>
+        </div>
+      </div>
+      <div class="ev-suggestion">
+        <div class="suggestion-icon">!</div>
+        <div class="suggestion-text">
+          <strong>Tidak ada di PRD sama sekali — harus ditambahkan di FE.</strong> Audience <em>"AddToCart tapi belum Purchase"</em> adalah segment retargeting dengan conversion rate tertinggi di Meta. Untuk flow <strong>"Beli Sekarang"</strong>: fire AddToCart di FE saat klik, kemudian InitiateCheckout dari BE saat checkout session terbuat. Keduanya berurutan, tidak perlu server-side untuk AddToCart-nya.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+
+  <!-- EVENT 4: INITIATE CHECKOUT -->
+  <div class="section-label">Event 04</div>
+  <div class="ev-card status-partial">
+    <div class="ev-head">
+      <div class="ev-head-left">
+        <div class="ev-dot ev-dot-partial"></div>
+        <div>
+          <div class="ev-name">InitiateCheckout</div>
+          <div class="ev-ga4">begin_checkout — GA4</div>
+        </div>
+      </div>
+      <div class="ev-badges">
+        <span class="badge b-be">BE</span>
+        <span class="badge b-partial">Ada di PRD · parameter missing</span>
+      </div>
+    </div>
+    <div class="ev-body">
+      <div class="ev-section">
+        <div class="ev-section-label">Trigger</div>
+        <div class="trigger-box">
+          <div class="trigger-screen">
+            <span class="trigger-icon">🛍</span>
+            Cart Page
+          </div>
+          <div class="trigger-action">Klik "Beli" → BE membuat checkout session</div>
+          <div class="trigger-note">⚠ Juga harus fire untuk flow "Beli Sekarang" dari PDP.</div>
+        </div>
+      </div>
+      <div class="ev-section">
+        <div class="ev-section-label">Parameters</div>
+        <div class="param-row">
+          <div><span class="param-name">currency</span><br><span class="param-req">Required · Meta & GA4</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">value</span><br><span class="param-req">Required · Meta & GA4</span></div>
+          <span class="param-status ps-ok">Pre-promo ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_ids</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">contents</span><br><span class="param-req">Recommended · Meta</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">_fbc, _fbp</span><br><span class="param-req">Required · CAPI</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">email, phone (hashed)</span><br><span class="param-req">Required · CAPI</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_type</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing ❌</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">event_id</span><br><span class="param-req">Required · CAPI dedup</span></div>
+          <span class="param-status ps-missing">Missing ❌</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">external_id</span><br><span class="param-req">Recommended · CAPI EMQ</span></div>
+          <span class="param-status ps-missing">Missing ❌</span>
+        </div>
+      </div>
+      <div class="ev-suggestion">
+        <div class="suggestion-icon">!</div>
+        <div class="suggestion-text">
+          Tambah <code>content_type: "product"</code> — ini wajib untuk catalog matching di Meta, langsung affect EMQ score yang jadi tujuan utama PRD ini.<br><br>
+          <code>event_id</code> harus pakai checkout session ID yang unik. Tanpa ini, deduplication antara FE dan BE selama parallel run tidak akan bekerja dan data bisa double count.<br><br>
+          <code>external_id</code> (hashed user ID Toco) tambahkan kalau user sudah login — salah satu signal EMQ tertinggi di CAPI.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+
+  <!-- EVENT 5: PURCHASE -->
+  <div class="section-label">Event 05</div>
+  <div class="ev-card status-partial">
+    <div class="ev-head">
+      <div class="ev-head-left">
+        <div class="ev-dot ev-dot-partial"></div>
+        <div>
+          <div class="ev-name">Purchase</div>
+          <div class="ev-ga4">purchase — GA4</div>
+        </div>
+      </div>
+      <div class="ev-badges">
+        <span class="badge b-be">BE</span>
+        <span class="badge b-partial">Ada di PRD · parameter missing</span>
+      </div>
+    </div>
+    <div class="ev-body">
+      <div class="ev-section">
+        <div class="ev-section-label">Trigger</div>
+        <div class="trigger-box">
+          <div class="trigger-screen">
+            <span class="trigger-icon">✅</span>
+            Order Confirmed
+          </div>
+          <div class="trigger-action">BE membuat order → fire async setelah order terbuat</div>
+        </div>
+      </div>
+      <div class="ev-section">
+        <div class="ev-section-label">Parameters</div>
+        <div class="param-row">
+          <div><span class="param-name">currency</span><br><span class="param-req">Required · Meta & GA4</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">value</span><br><span class="param-req">Required · Meta & GA4</span></div>
+          <span class="param-status ps-ok">Post-promo ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_ids</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">contents</span><br><span class="param-req">Recommended · Meta</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">event_id</span><br><span class="param-req">Required · CAPI dedup</span></div>
+          <span class="param-status ps-ok">= Order ID ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">transaction_id</span><br><span class="param-req">Required · GA4</span></div>
+          <span class="param-status ps-ok">= Order ID ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">_fbc, _fbp, email, phone</span><br><span class="param-req">Required · CAPI</span></div>
+          <span class="param-status ps-ok">Ada ✓</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">content_type</span><br><span class="param-req">Required · Meta</span></div>
+          <span class="param-status ps-missing">Missing ❌</span>
+        </div>
+        <div class="param-row">
+          <div><span class="param-name">external_id</span><br><span class="param-req">Recommended · CAPI EMQ</span></div>
+          <span class="param-status ps-missing">Missing ❌</span>
+        </div>
+      </div>
+      <div class="ev-suggestion">
+        <div class="suggestion-icon">!</div>
+        <div class="suggestion-text">
+          Sama seperti InitiateCheckout — tambah <code>content_type: "product"</code> dan <code>external_id</code>.<br><br>
+          Satu hal penting: pastikan <strong>format Order ID konsisten persis</strong> antara FE dan BE sebelum parallel run. Kalau BE kirim <code>"ORD-12345"</code> tapi FE kirim <code>"12345"</code>, Meta tidak akan mengenali keduanya sebagai event yang sama dan deduplication gagal.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Event Tracking Review · Toco · Yudis (Marketing) · 8 Mei 2026 · Internal use only
+</div>
+
+</body>
+</html>
